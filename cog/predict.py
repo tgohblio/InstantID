@@ -104,7 +104,7 @@ class Predictor(BasePredictor):
             local_files_only=True,
         )
 
-        base_model_path = "stabilityai/stable-diffusion-xl-base-1.0"
+        base_model_path = "stablediffusionapi/albedobase-xl-20"
         self.pipe = StableDiffusionXLInstantIDPipeline.from_pretrained(
             base_model_path,
             controlnet=self.controlnet,
