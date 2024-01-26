@@ -91,6 +91,7 @@ class Predictor(BasePredictor):
             torch_dtype=torch.float16,
             cache_dir=SD_MODEL_CACHE,
             use_safetensors=True,
+            local_files_only=True,
         )
         self.pipe.cuda()
         self.pipe.load_ip_adapter_instantid(face_adapter)
