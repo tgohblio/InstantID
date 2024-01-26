@@ -47,5 +47,5 @@ if not os.path.exists(MODELS_CACHE):
 
 if not os.path.exists(CHECKPOINTS_CACHE):
     download_weights(CHECKPOINT_IP_ADAPTER_URL, CHECKPOINTS_CACHE)
-    download_weights(CHECKPOINT_CTRLNET_URL, f"{CHECKPOINTS_CACHE}\ControlNetModel")
-    download_weights(CHECKPOINT_CTRLNET_CFG_URL, f"{CHECKPOINTS_CACHE}\ControlNetModel")
+    download_weights(CHECKPOINT_CTRLNET_URL, f"{CHECKPOINTS_CACHE}/ControlNetModel")
+    download_weights(CHECKPOINT_CTRLNET_CFG_URL, f"{CHECKPOINTS_CACHE}/ControlNetModel")
