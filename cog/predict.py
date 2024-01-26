@@ -32,7 +32,7 @@ SD_MODEL_NAME = "GraydientPlatformAPI/albedobase2-xl"
 
 # safety model
 SAFETY_MODEL_CACHE = "./safety_cache"
-FEATURE_EXTRACT_CACHE = "./feature_cache"
+FEATURE_EXTRACT_CACHE = "feature_cache"
 
 def resize_img(
     input_image,
