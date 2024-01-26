@@ -20,16 +20,13 @@ CHECKPOINTS_CACHE = "./checkpoints"
 MODELS_CACHE = "./models"
 MODELS_URL = "https://weights.replicate.delivery/default/InstantID/models.tar"
 
-# Make cache folder
-if not os.path.exists(SD_MODEL_CACHE):
-    os.makedirs(SD_MODEL_CACHE)
-
 # Download and save the SD model weights
 pipe = StableDiffusionXLPipeline.from_pretrained(
   SD_MODEL_NAME,
   torch_dtype=torch.float16,
   safety_checker=None,
 )
+# Save to cache folder. Will be created if doesn't exist.
 pipe.save_pretrained(SD_MODEL_CACHE)
 
 # Download the ip-adapter and ControlNetModel checkpoints

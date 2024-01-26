@@ -93,7 +93,7 @@ class Predictor(BasePredictor):
             safety_checker=None,
             requires_safety_checker=False,
             use_safetensors=True,
-            local_files_only=True,
+            local_files_only=False,
         )
         self.pipe.cuda()
         self.pipe.load_ip_adapter_instantid(face_adapter)
