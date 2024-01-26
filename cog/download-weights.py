@@ -11,7 +11,7 @@ from diffusers import StableDiffusionXLPipeline
 # append project directory to path so predict.py can be imported
 sys.path.append('.')
 
-from predict import SD_MODEL_NAME, SD_MODEL_CACHE, SAFETY_MODEL_CACHE
+from predict import SD_MODEL_NAME, SD_MODEL_CACHE
 
 # for ip-adapter and ControlNetModel
 CHECKPOINTS_CACHE = "./checkpoints"
@@ -19,10 +19,6 @@ CHECKPOINTS_CACHE = "./checkpoints"
 # for `models/antelopev2`
 MODELS_CACHE = "./models"
 MODELS_URL = "https://weights.replicate.delivery/default/InstantID/models.tar"
-
-# for safety checker
-SAFETY_URL = "https://weights.replicate.delivery/default/sdxl/safety-1.0.tar"
-
 
 # Download and save the SD model weights
 pipe = StableDiffusionXLPipeline.from_pretrained(
@@ -43,9 +39,6 @@ def download_weights(url, dest):
 
 if not os.path.exists(MODELS_CACHE):
     download_weights(MODELS_URL, MODELS_CACHE)
-
-if not os.path.exists(SAFETY_MODEL_CACHE):
-    download_weights(SAFETY_URL, SAFETY_MODEL_CACHE)
 
 if not os.path.exists(CHECKPOINTS_CACHE):
     hf_hub_download(

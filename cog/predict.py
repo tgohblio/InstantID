@@ -13,8 +13,7 @@ from PIL import Image
 
 from diffusers.utils import load_image
 from diffusers.models import ControlNetModel
-from diffusers.pipelines.stable_diffusion.safety_checker import StableDiffusionSafetyChecker
-from transformers import CLIPImageProcessor
+
 from insightface.app import FaceAnalysis
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
@@ -29,10 +28,6 @@ CHECKPOINTS_CACHE = "./checkpoints"
 # for SDXL model
 SD_MODEL_CACHE = "./sd_model"
 SD_MODEL_NAME = "GraydientPlatformAPI/albedobase2-xl"
-
-# safety model
-SAFETY_MODEL_CACHE = "./safety_cache"
-FEATURE_EXTRACT_CACHE = "feature-extractor"
 
 def resize_img(
     input_image,
@@ -68,12 +63,6 @@ def resize_img(
 
 class Predictor(BasePredictor):
     def setup(self) -> None:
-        """Load safety checker"""
-        self.safety_checker = StableDiffusionSafetyChecker.from_pretrained(
-            SAFETY_MODEL_CACHE, torch_dtype=torch.float16
-        ).to("cuda")
-        self.feature_extractor = CLIPImageProcessor.from_pretrained(FEATURE_EXTRACT_CACHE)
-
         """Load the model into memory to make running multiple predictions efficient"""
         self.width, self.height = 640, 640
         self.app = FaceAnalysis(
@@ -102,22 +91,10 @@ class Predictor(BasePredictor):
             torch_dtype=torch.float16,
             cache_dir=SD_MODEL_CACHE,
             use_safetensors=True,
-            local_files_only=True,
         )
         self.pipe.cuda()
         self.pipe.load_ip_adapter_instantid(face_adapter)
 
-    def run_safety_checker(self, image):
-        """Detect nsfw content"""
-        safety_checker_input = self.feature_extractor(image, return_tensors="pt").to("cuda")
-        np_image = [np.array(val) for val in image]
-        image, has_nsfw_concept = self.safety_checker(
-            images=np_image,
-            clip_input=safety_checker_input.pixel_values.to(torch.float16),
-        )
-        return image, has_nsfw_concept
-
-    @torch.inference_mode()
     def predict(
         self,
         image: Path = Input(description="Input image"),
@@ -165,10 +142,6 @@ class Predictor(BasePredictor):
             ge=1,
             le=50,
         ),
-        safety_checker: bool = Input(
-            description="Safety checker is enabled by default. Untick to expose unfiltered results.",
-            default=True,
-        ),
     ) -> Path:
         """Run a single prediction on the model"""
         if self.width != width or self.height != height:
@@ -192,7 +165,7 @@ class Predictor(BasePredictor):
         face_kps = draw_kps(face_image, face_info["kps"])
 
         self.pipe.set_ip_adapter_scale(ip_adapter_scale)
-        output = self.pipe(
+        image = self.pipe(
             prompt=prompt,
             negative_prompt=negative_prompt,
             image_embeds=face_emb,
@@ -200,23 +173,8 @@ class Predictor(BasePredictor):
             controlnet_conditioning_scale=controlnet_conditioning_scale,
             num_inference_steps=num_inference_steps,
             guidance_scale=guidance_scale,
-        )
+        ).images[0]
 
-        if safety_checker:
-            _, has_nsfw_content = self.run_safety_checker(output.images)
-
-        output_paths = []
-        for i, sample in enumerate(output.images):
-            if safety_checker and has_nsfw_content[i]:
-                print(f"NSFW content detected in image {i}")
-                continue
-            output_path = f"/tmp/out-{i}.png"
-            sample.save(output_path)
-            output_paths.append(Path(output_path))
-
-        if safety_checker and len(output_paths) == 0:
-            raise Exception(
-                f"NSFW content detected. Try running it again, or try a different prompt."
-            )
-
-        return output_paths
+        output_path = "result.jpg"
+        image.save(output_path)
+        return Path(output_path)
