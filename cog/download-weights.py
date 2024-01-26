@@ -30,7 +30,6 @@ if not os.path.exists(SD_MODEL_CACHE):
 pipe = StableDiffusionXLPipeline.from_pretrained(
   SD_MODEL_NAME,
   torch_dtype=torch.float16,
-  use_safetensors=True,
   safety_checker=None,
 )
 pipe.save_pretrained(SD_MODEL_CACHE)
