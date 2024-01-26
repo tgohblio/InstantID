@@ -45,5 +45,15 @@ if not os.path.exists(MODELS_CACHE):
 
 if not os.path.exists(CHECKPOINTS_CACHE):
     hf_hub_download(repo_id="InstantX/InstantID", filename="ip-adapter.bin", local_dir=CHECKPOINTS_CACHE)
-    hf_hub_download(repo_id="InstantX/InstantID", filename="ControlNetModel/config.json", local_dir=CHECKPOINTS_CACHE)
-    hf_hub_download(repo_id="InstantX/InstantID", filename="ControlNetModel/diffusion_pytorch_model.safetensors", local_dir=CHECKPOINTS_CACHE)
+    hf_hub_download(
+        repo_id="InstantX/InstantID",
+        filename="ControlNetModel/config.json",
+        local_dir_use_symlinks=False,
+        local_dir=CHECKPOINTS_CACHE
+    )
+    hf_hub_download(
+        repo_id="InstantX/InstantID",
+        filename="ControlNetModel/diffusion_pytorch_model.safetensors",
+        local_dir_use_symlinks=False,
+        local_dir=CHECKPOINTS_CACHE
+    )
