@@ -4,8 +4,6 @@
 import os
 import sys
 
-import time
-import subprocess
 from cog import BasePredictor, Input, Path
 
 import cv2
@@ -24,16 +22,12 @@ from pipeline_stable_diffusion_xl_instantid import (
     draw_kps,
 )
 
-# for `ip-adaper`, `ControlNetModel`, and `stable-diffusion-xl-base-1.0`
+# for ip-adapter, ControlNetModel
 CHECKPOINTS_CACHE = "./checkpoints"
-CHECKPOINTS_URL = (
-    "https://weights.replicate.delivery/default/InstantID/checkpoints.tar"
-)
 
-# for `models/antelopev2`
-MODELS_CACHE = "./models"
-MODELS_URL = "https://weights.replicate.delivery/default/InstantID/models.tar"
-
+# for SDXL model
+SD_MODEL_CACHE = "./sd_model"
+SD_MODEL_NAME = "stablediffusionapi/albedobase-xl-20"
 
 def resize_img(
     input_image,
@@ -67,23 +61,9 @@ def resize_img(
     return input_image
 
 
-def download_weights(url, dest):
-    start = time.time()
-    print("downloading url: ", url)
-    print("downloading to: ", dest)
-    subprocess.check_call(["pget", "-x", url, dest], close_fds=False)
-    print("downloading took: ", time.time() - start)
-
-
 class Predictor(BasePredictor):
     def setup(self) -> None:
         """Load the model into memory to make running multiple predictions efficient"""
-        if not os.path.exists(CHECKPOINTS_CACHE):
-            download_weights(CHECKPOINTS_URL, CHECKPOINTS_CACHE)
-
-        if not os.path.exists(MODELS_CACHE):
-            download_weights(MODELS_URL, MODELS_CACHE)
-
         self.width, self.height = 640, 640
         self.app = FaceAnalysis(
             name="antelopev2",
@@ -93,8 +73,8 @@ class Predictor(BasePredictor):
         self.app.prepare(ctx_id=0, det_size=(self.width, self.height))
 
         # Path to InstantID models
-        face_adapter = f"./checkpoints/ip-adapter.bin"
-        controlnet_path = f"./checkpoints/ControlNetModel"
+        face_adapter = f"{CHECKPOINTS_CACHE}/ip-adapter.bin"
+        controlnet_path = f"{CHECKPOINTS_CACHE}/ControlNetModel"
 
         # Load pipeline
         self.controlnet = ControlNetModel.from_pretrained(
@@ -104,12 +84,13 @@ class Predictor(BasePredictor):
             local_files_only=True,
         )
 
-        base_model_path = "stablediffusionapi/albedobase-xl-20"
         self.pipe = StableDiffusionXLInstantIDPipeline.from_pretrained(
-            base_model_path,
+            SD_MODEL_NAME,
             controlnet=self.controlnet,
             torch_dtype=torch.float16,
-            cache_dir=CHECKPOINTS_CACHE,
+            cache_dir=SD_MODEL_CACHE,
+            safety_checker=None,
+            requires_safety_checker=False,
             local_files_only=True,
         )
         self.pipe.cuda()
