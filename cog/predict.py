@@ -27,7 +27,7 @@ CHECKPOINTS_CACHE = "./checkpoints"
 
 # for SDXL model
 SD_MODEL_CACHE = "./sd_model"
-SD_MODEL_NAME = "stablediffusionapi/albedobase-xl-20"
+SD_MODEL_NAME = "GraydientPlatformAPI/albedobase2-xl"
 
 def resize_img(
     input_image,
