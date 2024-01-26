@@ -81,6 +81,7 @@ class Predictor(BasePredictor):
             controlnet_path,
             torch_dtype=torch.float16,
             cache_dir=CHECKPOINTS_CACHE,
+            use_safetensors=True,
             local_files_only=True,
         )
 
@@ -91,6 +92,7 @@ class Predictor(BasePredictor):
             cache_dir=SD_MODEL_CACHE,
             safety_checker=None,
             requires_safety_checker=False,
+            use_safetensors=True,
             local_files_only=True,
         )
         self.pipe.cuda()

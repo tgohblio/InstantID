@@ -23,6 +23,7 @@ build:
     - "diffusers==0.25.1"
     - "onnxruntime==1.16.3"
     - "huggingface-hub==0.20.3"
+    - "safetensors==0.4.2"
 
   # commands run after the environment is setup
   run:
