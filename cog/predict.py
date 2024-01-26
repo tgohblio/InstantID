@@ -70,9 +70,8 @@ class Predictor(BasePredictor):
     def setup(self) -> None:
         """Load safety checker"""
         self.safety_checker = StableDiffusionSafetyChecker.from_pretrained(
-            cache_dir=SAFETY_MODEL_CACHE,
-            local_files_only=True,
-        )
+            SAFETY_MODEL_CACHE, torch_dtype=torch.float16
+        ).to("cuda")
         self.feature_extractor = CLIPImageProcessor.from_pretrained(FEATURE_EXTRACT_CACHE)
 
         """Load the model into memory to make running multiple predictions efficient"""
