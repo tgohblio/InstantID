@@ -22,9 +22,8 @@ MODELS_URL = "https://weights.replicate.delivery/default/InstantID/models.tar"
 
 # Download and save the SD model weights
 pipe = StableDiffusionXLPipeline.from_pretrained(
-  SD_MODEL_NAME,
-  torch_dtype=torch.float16,
-  safety_checker=None,
+    SD_MODEL_NAME,
+    torch_dtype=torch.float16,
 )
 # Save to cache folder. Will be created if doesn't exist.
 pipe.save_pretrained(SD_MODEL_CACHE)
