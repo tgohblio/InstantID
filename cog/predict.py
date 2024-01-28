@@ -11,6 +11,7 @@ import torch
 import numpy as np
 from PIL import Image
 
+from diffusers import LCMScheduler
 from diffusers.utils import load_image
 from diffusers.models import ControlNetModel
 from diffusers.pipelines.stable_diffusion.safety_checker import StableDiffusionSafetyChecker
@@ -103,6 +104,12 @@ class Predictor(BasePredictor):
             cache_dir=SD_MODEL_CACHE,
             use_safetensors=True,
         )
+
+        # load LCM LoRA
+        self.pipe.load_lora_weights(f"{CHECKPOINTS_CACHE}/pytorch_lora_weights.safetensors")
+        self.pipe.fuse_lora()
+        self.pipe.scheduler = LCMScheduler.from_config(self.pipe.scheduler.config)
+
         self.pipe.cuda()
         self.pipe.load_ip_adapter_instantid(face_adapter)
 
@@ -153,16 +160,16 @@ class Predictor(BasePredictor):
             le=1,
         ),
         num_inference_steps: int = Input(
-            description="Number of denoising steps",
-            default=30,
+            description="Number of denoising steps. With LCM-LoRA, optimum is 6-8.",
+            default=6,
             ge=1,
-            le=500,
+            le=30,
         ),
         guidance_scale: float = Input(
-            description="Scale for classifier-free guidance",
-            default=5,
-            ge=1,
-            le=50,
+            description="Scale for classifier-free guidance. With LCM-LoRA, optimum is 0-5.",
+            default=0,
+            ge=0,
+            le=10,
         ),
         safety_checker: bool = Input(
             description="Safety checker is enabled by default. Un-tick to expose unfiltered results.",

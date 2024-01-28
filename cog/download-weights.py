@@ -63,3 +63,9 @@ if not os.path.exists(CHECKPOINTS_CACHE):
         local_dir_use_symlinks=False,
         local_dir=CHECKPOINTS_CACHE
     )
+    hf_hub_download(
+        repo_id="latent-consistency/lcm-lora-sdxl",
+        filename="pytorch_lora_weights.safetensors",
+        local_dir_use_symlinks=False,
+        local_dir=CHECKPOINTS_CACHE
+    )
