@@ -27,3 +27,5 @@ tests/
 *.png
 *.jpg
 *.jpeg
+*.ipynb
+*.ipynb_checkpoints
