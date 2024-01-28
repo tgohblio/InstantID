@@ -189,7 +189,7 @@ class Predictor(BasePredictor):
         face_kps = draw_kps(face_image, face_info["kps"])
 
         self.pipe.set_ip_adapter_scale(ip_adapter_scale)
-        output = self.pipe(
+        image = self.pipe(
             prompt=prompt,
             negative_prompt=negative_prompt,
             image_embeds=face_emb,
@@ -197,9 +197,10 @@ class Predictor(BasePredictor):
             controlnet_conditioning_scale=controlnet_conditioning_scale,
             num_inference_steps=num_inference_steps,
             guidance_scale=guidance_scale,
-        )
+        ).images[0]
         output_path = "result.jpg"
 
+        output = [image]
         if safety_checker:
             image_list, has_nsfw_content = self.run_safety_checker(output)
             if has_nsfw_content[0]:
@@ -207,8 +208,8 @@ class Predictor(BasePredictor):
                 black = Image.fromarray(np.uint8(image_list[0])).convert('RGB')    # black box image
                 black.save(output_path)
             else:
-                output.images[0].save(output_path)
+                image.save(output_path)
         else:
-            output.images[0].save(output_path)       
+            image.save(output_path)       
 
         return Path(output_path)
