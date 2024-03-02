@@ -144,7 +144,7 @@ face_image = load_image("./examples/yann-lecun_resize.jpg")
 
 # prepare face emb
 face_info = app.get(cv2.cvtColor(np.array(face_image), cv2.COLOR_RGB2BGR))
-face_info = sorted(face_info, key=lambda x:(x['bbox'][2]-x['bbox'][0])*x['bbox'][3]-x['bbox'][1])[-1]  # only use the maximum face
+face_info = sorted(face_info, key=lambda x:(x['bbox'][2]-x['bbox'][0])*(x['bbox'][3]-x['bbox'][1]))[-1]  # only use the maximum face
 face_emb = face_info['embedding']
 face_kps = draw_kps(face_image, face_info['kps'])
 
@@ -155,6 +155,7 @@ negative_prompt = "ugly, deformed, noisy, blurry, low contrast, realism, photore
 # generate image
 image = pipe(
     prompt,
+    negative_prompt=negative_prompt,
     image_embeds=face_emb,
     image=face_kps,
     controlnet_conditioning_scale=0.8,
@@ -219,6 +220,7 @@ gradio_demo/app-multicontrolnet.py
 - [Mikubill/sd-webui-controlnet](https://github.com/Mikubill/sd-webui-controlnet/discussions/2589)
 
 ### ComfyUI
+- [cubiq/ComfyUI_InstantID](https://github.com/cubiq/ComfyUI_InstantID)
 - [ZHO-ZHO-ZHO/ComfyUI-InstantID](https://github.com/ZHO-ZHO-ZHO/ComfyUI-InstantID)
 - [huxiuhan/ComfyUI-InstantID](https://github.com/huxiuhan/ComfyUI-InstantID)
 
